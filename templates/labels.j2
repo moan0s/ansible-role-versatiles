@@ -1,0 +1,39 @@
+{% if versatiles_container_labels_traefik_enabled %}
+{% if versatiles_container_labels_traefik_docker_network %}
+traefik.docker.network={{ versatiles_container_labels_traefik_docker_network }}
+{% endif %}
+
+{% set middlewares = [] %}
+
+{% if versatiles_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
+{% for name, value in versatiles_container_labels_traefik_additional_request_headers.items() %}
+traefik.http.middlewares.{{ versatiles_identifier }}-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [versatiles_identifier + '-add-request-headers'] %}
+{% endif %}
+
+{% if versatiles_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
+{% for name, value in versatiles_container_labels_traefik_additional_response_headers.items() %}
+traefik.http.middlewares.{{ versatiles_identifier }}-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [versatiles_identifier + '-add-response-headers'] %}
+{% endif %}
+
+traefik.enable=true
+{% endif %}
+traefik.http.routers.{{ versatiles_identifier }}.rule=Host("{{ versatiles_hostname }}")
+{% if versatiles_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ versatiles_identifier }}.priority={{ versatiles_container_labels_traefik_priority }}
+{% endif %}
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ versatiles_identifier }}.middlewares={{ middlewares | join(',') }}
+{% endif %}
+traefik.http.routers.{{ versatiles_identifier }}.service={{ versatiles_identifier }}
+traefik.http.routers.{{ versatiles_identifier }}.entrypoints={{ versatiles_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ versatiles_identifier }}.tls={{ versatiles_container_labels_traefik_tls | to_json }}
+{% if versatiles_container_labels_traefik_tls %}
+traefik.http.routers.{{ versatiles_identifier }}.tls.certResolver={{ versatiles_container_labels_traefik_tls_certResolver }}
+{% endif %}
+traefik.http.services.{{ versatiles_identifier }}.loadbalancer.server.port={{ versatiles_container_http_port }}
+
+{{ versatiles_container_labels_additional_labels }}

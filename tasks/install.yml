@@ -1,0 +1,56 @@
+---
+
+- name: Ensure versatiles network is created in Docker
+  community.docker.docker_network:
+    name: "{{ versatiles_container_network }}"
+    driver: bridge
+
+
+- name: Ensure versatiles path exists
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: 0700
+    owner: "{{ versatiles_uid }}"
+    group: "{{ versatiles_gid }}"
+  with_items:
+    - {path: "{{ versatiles_base_path }}", when: true}
+    - {path: "{{ versatiles_config_path }}", when: true}
+
+- name: Ensure versatiles data path exists
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: 0755
+    owner: "{{ versatiles_uid }}"
+    group: "{{ versatiles_gid }}"
+  with_items:
+    - {path: "{{ versatiles_data_path }}", when: true}
+
+
+- name: Ensure versatiles traefik labels are installed
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/labels.j2"
+    dest: "{{ versatiles_config_path }}/labels"
+    owner: "{{ versatiles_uid }}"
+    group: "{{ versatiles_gid }}"
+    mode: 0640
+
+- name: Ensure versatiles configuration is deployed
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/env.j2"
+    dest: "{{ versatiles_config_path }}/env"
+    owner: "{{ versatiles_uid }}"
+    group: "{{ versatiles_gid }}"
+    mode: 0640
+
+- name: Ensure versatiles container image is pulled
+  community.docker.docker_image:
+    name: "{{ versatiles_container_image }}"
+    source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
+
+- name: Ensure versatiles.service installed
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/systemd/versatiles.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ versatiles_identifier }}.service"
+    mode: 0644

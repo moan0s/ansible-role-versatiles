@@ -1,0 +1,157 @@
+---
+
+versatiles_enabled: true
+versatiles_identifier: versatiles
+
+versatiles_hostname: ''
+
+
+versatiles_uid: ''
+versatiles_gid: ''
+
+versatiles_base_path: "/{{ versatiles_identifier }}"
+versatiles_config_path: "{{ versatiles_base_path }}/config"
+versatiles_data_path: "{{ versatiles_base_path }}/data"
+versatiles_env_path: "{{ versatiles_config_path }}/env"
+
+versatiles_systemd_required_services_list: "{{ versatiles_systemd_required_services_list_default + versatiles_systemd_required_services_list_auto + versatiles_systemd_required_services_list_custom }}"
+versatiles_systemd_required_services_list_default: ['docker.service']
+versatiles_systemd_required_services_list_auto: []
+versatiles_systemd_required_services_list_custom: []
+
+versatiles_systemd_wanted_services_list: "{{ versatiles_systemd_wanted_services_list_default + versatiles_systemd_wanted_services_list_auto + versatiles_systemd_wanted_services_list_custom }}"
+versatiles_systemd_wanted_services_list_default: []
+versatiles_systemd_wanted_services_list_auto: []
+versatiles_systemd_wanted_services_list_custom: []
+
+
+versatiles_frontend_version: 2.0.5
+versatiles_frontend_download_url: "https://github.com/versatiles-org/versatiles-frontend/releases/download/v{{ versatiles_frontend_version }}/frontend.br.tar"
+
+versatiles_version: 0.12.6
+versatiles_container_image: "{{ versatiles_container_image_registry_prefix }}versatiles-org/versatiles:{{ versatiles_container_image_tag }}"
+versatiles_container_image_registry_prefix: ghcr.io/
+versatiles_container_image_tag: "v{{ versatiles_version }}"
+versatiles_container_image_force_pull: "{{ versatiles_container_image.endswith(':latest') }}"
+
+versatiles_container_network: '{{ versatiles_identifier }}'
+
+# The port number in the container
+versatiles_container_http_port: 8080
+
+# Controls whether the versatiles container exposes its HTTP port (as defined by `versatiles_container_http_port`).
+#
+# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:8731"), or empty string to not expose.
+versatiles_container_http_host_bind_port: ""
+
+# A list of additional container networks that the container would be connected to.
+# The role does not create these networks, so make sure they already exist.
+# Use this to expose this container to a reverse proxy, which runs in a different container network.
+versatiles_container_additional_networks: "{{ versatiles_container_additional_networks_auto + versatiles_container_additional_networks_custom }}"
+versatiles_container_additional_networks_auto: []
+versatiles_container_additional_networks_custom: []
+
+# Additional environment variables to pass to the versatiles container.
+# You can use this to further influence the default configuration.
+#
+# Example:
+# versatiles_environment_variables_extension: |
+#   versatiles_STORAGE_BACKEND=s3
+#   versatiles_STORAGE_S3_ENDPOINT=minio:9000
+#   versatiles_STORAGE_S3_BUCKET=something
+#   versatiles_STORAGE_S3_SECRET_KEY=verysecret
+versatiles_environment_variables_extension: ''
+
+# versatiles_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# See `roles/custom/versatiles_versatiles/templates/labels.j2` for details.
+#
+# To inject your own other container labels, see `versatiles_container_labels_additional_labels`.
+versatiles_container_labels_traefik_enabled: false
+versatiles_container_labels_traefik_docker_network: ""
+versatiles_container_labels_traefik_entrypoints: web-secure
+versatiles_container_labels_traefik_priority: 0
+versatiles_container_labels_traefik_tls: "{{ versatiles_container_labels_traefik_entrypoints != 'web' }}"
+versatiles_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+
+# Controls which additional headers to attach to all HTTP requests.
+# To add your own custom request headers, use `versatiles_container_labels_traefik_additional_response_headers_custom`
+versatiles_container_labels_traefik_additional_request_headers: "{{ versatiles_container_labels_traefik_additional_request_headers_auto | combine(versatiles_container_labels_traefik_additional_request_headers_custom) }}"
+versatiles_container_labels_traefik_additional_request_headers_auto: {}
+versatiles_container_labels_traefik_additional_request_headers_custom: {}
+
+
+# Controls which additional headers to attach to all HTTP responses.
+# To add your own custom response headers, use `versatiles_container_labels_traefik_additional_response_headers_custom`
+versatiles_container_labels_traefik_additional_response_headers: "{{ versatiles_container_labels_traefik_additional_response_headers_auto | combine(versatiles_container_labels_traefik_additional_response_headers_custom) }}"
+versatiles_container_labels_traefik_additional_response_headers_auto: |
+  {{
+    {}
+    | combine ({'X-XSS-Protection': versatiles_http_header_xss_protection} if versatiles_http_header_xss_protection else {})
+    | combine ({'X-Frame-Options': versatiles_http_header_frame_options} if versatiles_http_header_frame_options else {})
+    | combine ({'X-Content-Type-Options': versatiles_http_header_content_type_options} if versatiles_http_header_content_type_options else {})
+    | combine ({'Content-Security-Policy': versatiles_http_header_content_security_policy} if versatiles_http_header_content_security_policy else {})
+    | combine ({'Permission-Policy': versatiles_http_header_content_permission_policy} if versatiles_http_header_content_permission_policy else {})
+    | combine ({'Strict-Transport-Security': versatiles_http_header_strict_transport_security} if versatiles_http_header_strict_transport_security and versatiles_container_labels_traefik_tls else {})
+  }}
+versatiles_container_labels_traefik_additional_response_headers_custom: {}
+
+# Specifies the value of the `X-XSS-Protection` header
+# Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
+#
+# Learn more about it is here:
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+# - https://portswigger.net/web-security/cross-site-scripting/reflected
+versatiles_http_header_xss_protection: "1; mode=block"
+
+# Specifies the value of the `X-Frame-Options` header which controls whether framing can happen.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+versatiles_http_header_frame_options: SAMEORIGIN
+
+# Specifies the value of the `X-Content-Type-Options` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+versatiles_http_header_content_type_options: nosniff
+
+# Specifies the value of the `Content-Security-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+versatiles_http_header_content_security_policy: frame-ancestors 'self'
+
+# Specifies the value of the `Permission-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permission-Policy
+versatiles_http_header_content_permission_policy: "{{ 'interest-cohort=()' if versatiles_floc_optout_enabled else '' }}"
+
+# Specifies the value of the `Strict-Transport-Security` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+versatiles_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if versatiles_hsts_preload_enabled else '' }}"
+
+# Controls whether to send a "Permissions-Policy interest-cohort=();" header along with all responses
+#
+# Learn more about what it is here:
+# - https://www.eff.org/deeplinks/2021/03/googles-floc-terrible-idea
+# - https://paramdeo.com/blog/opting-your-website-out-of-googles-floc-network
+# - https://amifloced.org/
+#
+# Of course, a better solution is to just stop using browsers (like Chrome), which participate in such tracking practices.
+# See: `versatiles_content_permission_policy`
+versatiles_floc_optout_enabled: true
+
+# Controls if HSTS preloading is enabled
+#
+# In its strongest and recommended form, the [HSTS policy](https://www.chromium.org/hsts) includes all subdomains, and
+# indicates a willingness to be "preloaded" into browsers:
+# `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+# For more information visit:
+# - https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+# - https://hstspreload.org/#opt-in
+# See: `versatiles_http_header_strict_transport_security`
+versatiles_hsts_preload_enabled: false
+
+
+# versatiles_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# See `roles/custom/collabora_online/templates/labels.j2` for details.
+#
+# Example:
+# versatiles_container_labels_additional_labels: |
+#   my.label=1
+#   another.label="here"
+versatiles_container_labels_additional_labels: ''

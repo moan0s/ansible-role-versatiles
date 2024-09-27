@@ -1,0 +1,23 @@
+---
+
+- name: Check existence of versatiles systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ versatiles_identifier }}.service"
+  register: versatiles_service_stat
+
+- when: versatiles_service_stat.stat.exists | bool
+  block:
+    - name: Ensure versatiles service is stopped
+      ansible.builtin.service:
+        name: "{{ versatiles_identifier }}"
+        state: stopped
+        daemon_reload: true
+    - name: Ensure versatiles service doesn't exist
+      ansible.builtin.file:
+        dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ versatiles_identifier }}.service"
+        state: absent
+
+    - name: Ensure versatiles base path is files deleted (make sure to delete node data)
+      ansible.builtin.file:
+        path: "{{ versatiles_base_path }}"
+        state: absent
