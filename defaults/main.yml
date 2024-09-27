@@ -100,6 +100,8 @@ versatiles_container_labels_traefik_additional_response_headers_auto: |
     | combine ({'Content-Security-Policy': versatiles_http_header_content_security_policy} if versatiles_http_header_content_security_policy else {})
     | combine ({'Permission-Policy': versatiles_http_header_content_permission_policy} if versatiles_http_header_content_permission_policy else {})
     | combine ({'Strict-Transport-Security': versatiles_http_header_strict_transport_security} if versatiles_http_header_strict_transport_security and versatiles_container_labels_traefik_tls else {})
+    | combine ({'Access-Control-Allow-Origin': versatiles_http_header_access_control_allow_origin} if versatiles_http_header_access_control_allow_origin else {})
+
   }}
 versatiles_container_labels_traefik_additional_response_headers_custom: {}
 
@@ -153,6 +155,10 @@ versatiles_floc_optout_enabled: true
 # - https://hstspreload.org/#opt-in
 # See: `versatiles_http_header_strict_transport_security`
 versatiles_hsts_preload_enabled: false
+
+
+# See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+versatiles_http_header_access_control_allow_origin: "*"
 
 
 # versatiles_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
