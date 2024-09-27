@@ -44,10 +44,17 @@
     group: "{{ versatiles_gid }}"
     mode: 0640
 
+- name: Download map data
+  ansible.builtin.get_url:
+    url: "{{ versatiles_map_download }}"
+    dest: "{{ versatiles_data_path }}/map.versatiles"
+    mode: '0440'
+    when: {{ versatiles_map_download_auto }}
+
 - name: Ensure versatiles container image is pulled
   community.docker.docker_image:
     name: "{{ versatiles_container_image }}"
-    source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
+    source: "pull"
 
 - name: Ensure versatiles.service installed
   ansible.builtin.template:

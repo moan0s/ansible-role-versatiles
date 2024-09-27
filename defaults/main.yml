@@ -5,6 +5,17 @@ versatiles_identifier: versatiles
 
 versatiles_hostname: ''
 
+# URL from where to download map
+# For testing, not the whole worls should be downloaded (which is ~50GB) but
+# a smaller subset. Leaving this setting as-is will download: Dresden, Germany
+# To download the whole world use the newest map from https://download.versatiles.org/
+# DO NOT USE osm.versatiles without date, as this will download the map every time!
+versatiles_map_download: 'https://github.com/moan0s/ansible-role-versatiles/releases/download/v0.0.1/dresden.versatiles'
+# Set this to false if you want to provide the map data yourself.
+# Use docker exec -it mash-versatiles versatiles convert --bbox "13.5,50.9,14.0,51.2" "https://download.versatiles.org/osm.versatiles" map.versatiles
+# to create a subset of the world (adjust the bounding box to your liking)
+versatiles_map_download_auto: true
+
 
 versatiles_uid: ''
 versatiles_gid: ''
