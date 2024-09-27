@@ -24,12 +24,8 @@ versatiles_systemd_wanted_services_list_default: []
 versatiles_systemd_wanted_services_list_auto: []
 versatiles_systemd_wanted_services_list_custom: []
 
-
-versatiles_frontend_version: 2.0.5
-versatiles_frontend_download_url: "https://github.com/versatiles-org/versatiles-frontend/releases/download/v{{ versatiles_frontend_version }}/frontend.br.tar"
-
 versatiles_version: 0.12.6
-versatiles_container_image: "{{ versatiles_container_image_registry_prefix }}versatiles-org/versatiles:{{ versatiles_container_image_tag }}"
+versatiles_container_image: "{{ versatiles_container_image_registry_prefix }}versatiles-org/versatiles-frontend:{{ versatiles_container_image_tag }}"
 versatiles_container_image_registry_prefix: ghcr.io/
 versatiles_container_image_tag: "v{{ versatiles_version }}"
 versatiles_container_image_force_pull: "{{ versatiles_container_image.endswith(':latest') }}"
