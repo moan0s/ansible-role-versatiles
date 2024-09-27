@@ -47,7 +47,7 @@
 - name: Download map data
   ansible.builtin.get_url:
     url: "{{ versatiles_map_download }}"
-    dest: "{{ versatiles_data_path }}/map.versatiles"
+    dest: "{{ versatiles_data_path }}/osm.versatiles"
     mode: '0660'
     owner: "{{ versatiles_uid }}"
     group: "{{ versatiles_gid }}"
