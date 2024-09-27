@@ -3,6 +3,8 @@
 versatiles_enabled: true
 versatiles_identifier: versatiles
 
+versatiles_version: 0.12.6
+
 versatiles_hostname: ''
 
 # URL from where to download map
@@ -35,7 +37,6 @@ versatiles_systemd_wanted_services_list_default: []
 versatiles_systemd_wanted_services_list_auto: []
 versatiles_systemd_wanted_services_list_custom: []
 
-versatiles_version: 0.12.6
 versatiles_container_image: "{{ versatiles_container_image_registry_prefix }}versatiles-org/versatiles-frontend:{{ versatiles_container_image_tag }}"
 versatiles_container_image_registry_prefix: ghcr.io/
 versatiles_container_image_tag: "v{{ versatiles_version }}"

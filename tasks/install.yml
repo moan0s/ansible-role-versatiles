@@ -48,8 +48,10 @@
   ansible.builtin.get_url:
     url: "{{ versatiles_map_download }}"
     dest: "{{ versatiles_data_path }}/map.versatiles"
-    mode: '0440'
-    when: {{ versatiles_map_download_auto }}
+    mode: '0660'
+    owner: "{{ versatiles_uid }}"
+    group: "{{ versatiles_gid }}"
+  when: "{{ versatiles_map_download_auto }}"
 
 - name: Ensure versatiles container image is pulled
   community.docker.docker_image:
