@@ -1,4 +1,4 @@
-# versatiles Ansible Role
+# Versatiles Ansible Role
 
 ![versatiles Logo](assets/logo.png)
 
